@@ -1,22 +1,46 @@
-<script>
-	export let version;
-	let name = "World";
-	let test = process.versions.electron;
-</script>
+<style>
+  :global(body) {
+    background-color: #fff;
+  }
+  main {
+    position: relative;
+    display: grid;
+    grid-gap: 0;
+    width: 100vw;
+    grid-template-areas: 'container container';
+    grid-template-columns: 1fr;
+  }
 
-<style type="text/scss">
-	h1 {
-		color: purple;
-		span {
-			color: green;
-		}
-	}
+  main.isFullScreen {
+    grid-template-areas: 'sidebar container';
+    grid-template-columns: 230px 1fr;
+  }
 </style>
 
-<h1>Hello <span>{name}</span>!</h1>
-<p>We are using Node.js version {process.versions.node},</p>
-<p>Chromium version {process.versions.chrome}</p>
-<p>and Electron version {process.versions.electron}.</p>
-<p>But most importantly <strong>Svelte</strong> version {version}!</p>
-<br>
-<p>This boilerplate, in addition to using Svelte with Electron, also uses <i>Node-Sass</i>!</p>
+<script type="text/javascript">
+  const { ipcRenderer } = window.electron;
+  import { onMount } from 'svelte';
+  import { token, expires } from './store';
+  import Sidebar from './components/Sidebar.svelte';
+  import Container from './components/Container.svelte';
+  import Header from './components/Header.svelte';
+
+  const headerHeight = '50px';
+
+  ipcRenderer.on('stackoverflow:login', (event, params) => {
+    ipcRenderer.send('stackoverflow:save-session', params);
+    token.update(() => params.token);
+    expires.update(() => params.expires);
+  });
+
+  window.addEventListener('resize', function() {
+    isFullScreen = window.innerWidth > 800;
+  });
+  $: isFullScreen = window.innerWidth > 800;
+</script>
+
+<Header height="{headerHeight}" />
+<main class:isFullScreen style="height: calc(100vh - {headerHeight});">
+  <Sidebar {isFullScreen} />
+  <Container />
+</main>

@@ -1,30 +1,27 @@
-const {app, BrowserWindow} = require('electron');
-
-let mainWindow;
-
-function createWindow () {
-  mainWindow = new BrowserWindow({
+const { app, BrowserWindow } = require('electron')
+const path = require('path')
+app.allowRendererProcessReuse = true;
+function createWindow() {
+  const mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
-      nodeIntegration: true
-    },
-    icon: 'icon.png'
-  });
+      preload: path.join(__dirname, 'public', 'preload.js')
+    }
+  })
 
-  mainWindow.loadFile('public/index.html');
-
-  mainWindow.on('closed', function () {
-    mainWindow = null
-  });
+  mainWindow.loadFile(path.join(__dirname, 'public', 'index.html'));
+  mainWindow.webContents.openDevTools();
 }
 
-app.on('ready', createWindow);
+app.whenReady().then(createWindow)
 
 app.on('window-all-closed', function () {
-  if (process.platform !== 'darwin') app.quit();
+  if (process.platform !== 'darwin') app.quit()
 })
 
 app.on('activate', function () {
-  if (mainWindow === null) createWindow();
+  if (BrowserWindow.getAllWindows().length === 0) createWindow()
 })
+
+require('./main-process/stackoverflow-autologin');
