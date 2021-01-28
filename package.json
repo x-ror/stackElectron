@@ -7,7 +7,7 @@
     "@rollup/plugin-commonjs": "^11.0.2",
     "svelte-routing": "^1.4.2",
     "concurrently": "^5.1.0",
-    "electron": "^8.5.2",
+    "electron": "^9.4.0",
     "node-sass": "^4.13.1",
     "npm-run-all": "^4.1.5",
     "rollup": "^2.3.2",
